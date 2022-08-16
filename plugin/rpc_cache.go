@@ -111,7 +111,7 @@ func ServerFilter(t *RpcCachePlugin) filter.ServerFilter {
 					subRsp, subErr := handle(ctx, req)
 					return subRsp, subErr
 				}
-				err := v.lc.GetOrLoad(ctx, key, newRsp, loadFunc, v.SerializationType)
+				err := v.lc.GetWithLoad(ctx, key, newRsp, loadFunc, v.SerializationType)
 				trpc.SetMetaData(ctx, fmt.Sprintf("%s_%s", pluginName, v.CacheName), []byte(hitCacheFlag))
 				reportCacheMonitor(v.CacheName, rpcName, hitCacheFlag, err)
 				return newRsp, err
@@ -143,7 +143,7 @@ func ClientFilter(t *RpcCachePlugin) filter.ClientFilter {
 					err := handle(ctx, req, rsp)
 					return rsp, err
 				}
-				err := v.lc.GetOrLoad(ctx, key, rsp, loadFunc, v.SerializationType)
+				err := v.lc.GetWithLoad(ctx, key, rsp, loadFunc, v.SerializationType)
 				trpc.SetMetaData(ctx, fmt.Sprintf("%s_%s", pluginName, v.CacheName), []byte(hitCacheFlag))
 				reportCacheMonitor(v.CacheName, rpcName, hitCacheFlag, err)
 				return err
