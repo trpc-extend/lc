@@ -52,6 +52,10 @@ type Cache struct {
 	MaxEntrySize int `yaml:"max_entry_size"`
 	// AllowUseExpiredEntry 在请求失败的情况下，允许使用未清除数据兜底
 	AllowUseExpiredEntry bool `yaml:"allow_use_expired_entry"`
+	// StatsEnabled 开启后计算单个key的命中次数
+	StatsEnabled bool `yaml:"stats_enabled"`
+	// Verbose 开启后输出内存申请信息
+	Verbose bool `yaml:"verbose"`
 
 	// FailoverRedis 兜底的redis配置 TODO 待支持redis兜底
 	FailoverRedis string `yaml:"failover_redis"`
@@ -86,7 +90,8 @@ func (t *RpcCachePlugin) Setup(name string, decoder plugin.Decoder) error {
 			lc.WithLifeWindow(time.Duration(c.LifeWindow)*time.Second),
 			lc.WithCleanWindow(time.Duration(c.CleanWindow)*time.Second),
 			lc.WithHardMaxCacheSize(c.HardMaxCacheSize),
-			lc.WithVerbose(true),
+			lc.WithStatsEnabled(c.StatsEnabled),
+			lc.WithVerbose(c.Verbose),
 			lc.WithMaxEntriesInWindow(c.MaxEntriesInWindow),
 			lc.WithMaxEntrySize(c.MaxEntrySize))
 		c.lc = lc.GetCache(c.RPCName)

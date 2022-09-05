@@ -68,8 +68,8 @@ func createCache(name string, opts ...Option) *Cache {
 		CleanWindow:        30 * time.Second, // 默认30秒清除窗口周期
 		MaxEntriesInWindow: 1000 * 10 * 60,   // 在最大窗口期最大缓存数目
 		MaxEntrySize:       1024,             // 默认每个司令大小 字节
-		StatsEnabled:       true,
-		Verbose:            true,
+		StatsEnabled:       false,
+		Verbose:            false,
 		HardMaxCacheSize:   2046, // 默认最大硬件内存2046M
 		Logger:             bigcache.DefaultLogger(),
 	}
