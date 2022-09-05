@@ -14,16 +14,16 @@ import (
 // (ServerFilter因为拿不到rsp实例对象需要用这个参数，ClientFilter可以忽略这个参数返回nil)
 type KeyFunc func(ctx context.Context, req interface{}) (key string, newRsp interface{})
 
-// DefaultKeyFunc 默认获取本地缓存key的方法
-var DefaultKeyFunc KeyFunc = func(ctx context.Context, req interface{}) (string, interface{}) {
+// keyFuncs key为rpcName
+var keyFuncs = make(map[string]KeyFunc)
+
+// dfKeyFunc 默认获取本地缓存key的方法
+var dfKeyFunc KeyFunc = func(ctx context.Context, req interface{}) (string, interface{}) {
 	body, _ := json.Marshal(req)
 	h := md5.New()
 	h.Write(body)
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
-
-// keyFuncs key为rpcName
-var keyFuncs = make(map[string]KeyFunc)
 
 // RegisterKeyFunc 注册keyFunc
 func RegisterKeyFunc(name string, fn KeyFunc) {
@@ -36,7 +36,7 @@ func GetKeyFunc(name string) KeyFunc {
 	if ok {
 		return keyFunc
 	}
-	return DefaultKeyFunc
+	return dfKeyFunc
 }
 
 // GetCacheFlag 获取是否命中缓存标志

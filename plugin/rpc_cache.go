@@ -52,6 +52,10 @@ type Cache struct {
 	MaxEntrySize int `yaml:"max_entry_size"`
 	// AllowUseExpiredEntry 在请求失败的情况下，允许使用未清除数据兜底
 	AllowUseExpiredEntry bool `yaml:"allow_use_expired_entry"`
+	// StatsEnabled 开启后计算单个key的命中次数
+	StatsEnabled bool `yaml:"stats_enabled"`
+	// Verbose 开启后输出内存申请信息
+	Verbose bool `yaml:"verbose"`
 
 	// FailoverRedis 兜底的redis配置 TODO 待支持redis兜底
 	FailoverRedis string `yaml:"failover_redis"`
@@ -86,7 +90,8 @@ func (t *RpcCachePlugin) Setup(name string, decoder plugin.Decoder) error {
 			lc.WithLifeWindow(time.Duration(c.LifeWindow)*time.Second),
 			lc.WithCleanWindow(time.Duration(c.CleanWindow)*time.Second),
 			lc.WithHardMaxCacheSize(c.HardMaxCacheSize),
-			lc.WithVerbose(true),
+			lc.WithStatsEnabled(c.StatsEnabled),
+			lc.WithVerbose(c.Verbose),
 			lc.WithMaxEntriesInWindow(c.MaxEntriesInWindow),
 			lc.WithMaxEntrySize(c.MaxEntrySize))
 		c.lc = lc.GetCache(c.RPCName)
@@ -111,7 +116,7 @@ func ServerFilter(t *RpcCachePlugin) filter.ServerFilter {
 					subRsp, subErr := handle(ctx, req)
 					return subRsp, subErr
 				}
-				err := v.lc.GetOrLoad(ctx, key, newRsp, loadFunc, v.SerializationType)
+				err := v.lc.GetWithLoad(ctx, key, newRsp, loadFunc, v.SerializationType)
 				trpc.SetMetaData(ctx, fmt.Sprintf("%s_%s", pluginName, v.CacheName), []byte(hitCacheFlag))
 				reportCacheMonitor(v.CacheName, rpcName, hitCacheFlag, err)
 				return newRsp, err
@@ -143,7 +148,7 @@ func ClientFilter(t *RpcCachePlugin) filter.ClientFilter {
 					err := handle(ctx, req, rsp)
 					return rsp, err
 				}
-				err := v.lc.GetOrLoad(ctx, key, rsp, loadFunc, v.SerializationType)
+				err := v.lc.GetWithLoad(ctx, key, rsp, loadFunc, v.SerializationType)
 				trpc.SetMetaData(ctx, fmt.Sprintf("%s_%s", pluginName, v.CacheName), []byte(hitCacheFlag))
 				reportCacheMonitor(v.CacheName, rpcName, hitCacheFlag, err)
 				return err

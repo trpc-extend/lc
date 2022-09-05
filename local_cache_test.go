@@ -49,7 +49,7 @@ func TestGetOrLoad(t *testing.T) {
 				return setData, nil
 			}
 			getData = &TestParam{}
-			err = cache.GetOrLoad(context.TODO(), key, getData, loadFunc, codec.SerializationTypeJSON)
+			err = cache.GetWithLoad(context.TODO(), key, getData, loadFunc, codec.SerializationTypeJSON)
 			convey.So(err, convey.ShouldBeNil)
 
 			getData = &TestParam{}
@@ -72,7 +72,7 @@ func TestGetOrLoad(t *testing.T) {
 			}
 			key := "test-fail"
 			getData := &TestParam{}
-			err := cache.GetOrLoad(context.TODO(), key, getData, loadFunc, codec.SerializationTypeJSON)
+			err := cache.GetWithLoad(context.TODO(), key, getData, loadFunc, codec.SerializationTypeJSON)
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(getData.Name, convey.ShouldEqual, setData.Name)
 
@@ -88,7 +88,7 @@ func TestGetOrLoad(t *testing.T) {
 
 			// cache过期，穿透失败，命中兜底
 			getData = &TestParam{}
-			err = cache.GetOrLoad(context.TODO(), key, getData, func() (interface{}, error) {
+			err = cache.GetWithLoad(context.TODO(), key, getData, func() (interface{}, error) {
 				return nil, errors.New("test-through-fail")
 			}, codec.SerializationTypeJSON)
 			convey.So(err, convey.ShouldNotBeNil)

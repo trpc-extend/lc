@@ -68,8 +68,8 @@ func createCache(name string, opts ...Option) *Cache {
 		CleanWindow:        30 * time.Second, // 默认30秒清除窗口周期
 		MaxEntriesInWindow: 1000 * 10 * 60,   // 在最大窗口期最大缓存数目
 		MaxEntrySize:       1024,             // 默认每个司令大小 字节
-		StatsEnabled:       true,
-		Verbose:            true,
+		StatsEnabled:       false,
+		Verbose:            false,
 		HardMaxCacheSize:   2046, // 默认最大硬件内存2046M
 		Logger:             bigcache.DefaultLogger(),
 	}
@@ -156,11 +156,11 @@ func (c *Cache) GetWithEntryStatus(key string, val interface{}, serializationTyp
 // LoadFunc 加载数据函数
 type LoadFunc func() (interface{}, error)
 
-// GetOrLoad Get或通过fn重新load数据
-// load func加singleflight做并发控制
+// GetWithLoad 获取key对应的value, 如果key不存在使用用户自定义fn函数加载数据返回
+// key 缓存对应的key
 // fn 缓存失效透传函数
 // serializationType 存储value的序列化方式
-func (c *Cache) GetOrLoad(ctx context.Context, key string, value interface{}, fn LoadFunc,
+func (c *Cache) GetWithLoad(ctx context.Context, key string, value interface{}, fn LoadFunc,
 	serializationType ...int) error {
 	entryStatus, err := c.GetWithEntryStatus(key, value, serializationType...)
 	if err == nil && entryStatus == bigcache.RemoveReason(0) {
