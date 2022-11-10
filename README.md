@@ -1,3 +1,7 @@
+# 通用本地缓存组件
+- 主动接口参考local_cache.go
+- 被动支持以拦截器模式配置使用
+
 # rpc_cache 服务端拦截器
 - 基于bigcache和singleflight实现
 1. 接口级缓存
