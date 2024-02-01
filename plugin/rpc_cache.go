@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/trpc-extend/trpc-go/lc"
+	"github.com/trpc-extend/lc"
 
 	"trpc.group/trpc-go/trpc-go"
 	"trpc.group/trpc-go/trpc-go/codec"

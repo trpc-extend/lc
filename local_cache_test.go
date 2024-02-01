@@ -3,7 +3,6 @@ package lc
 import (
 	"context"
 	"errors"
-	"google.golang.org/protobuf/types/known/anypb"
 	"testing"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes/any"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/smartystreets/goconvey/convey"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"trpc.group/trpc-go/trpc-go/codec"
 )
