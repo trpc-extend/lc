@@ -17,8 +17,8 @@ server:
 plugins:
  cache: # plugin type
      rpc_cache: # plugin name
-       - cache_name: "GetIntroduction" #标识缓存名称, 可用于数据监控上报
-         rpc_name: "/trpc.video_detail.sport_national_group.NationalGroupService/GetIntroduction"
+       - cache_name: "GetMax" #标识缓存名称, 可用于数据监控上报
+         rpc_name: "/trpc.app.server.services/GetMax"
          # 以下配置项对应bigcache配置
          life_window: 60 #缓存时间, 单位s
          clean_window: 120 #过期key清除时间间隔， 0表示不清理过期数据，可用做兜底

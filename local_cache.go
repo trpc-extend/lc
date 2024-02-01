@@ -9,9 +9,9 @@ import (
 	"github.com/allegro/bigcache/v3"
 	"golang.org/x/sync/singleflight"
 
-	"git.code.oa.com/trpc-go/trpc-go/codec"
-	"git.code.oa.com/trpc-go/trpc-go/errs"
-	"git.code.oa.com/trpc-go/trpc-go/log"
+	"trpc.group/trpc-go/trpc-go/codec"
+	"trpc.group/trpc-go/trpc-go/errs"
+	"trpc.group/trpc-go/trpc-go/log"
 )
 
 var (

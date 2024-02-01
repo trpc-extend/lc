@@ -3,15 +3,16 @@ package lc
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/anypb"
 	"testing"
 	"time"
 
-	"git.code.oa.com/trpc-go/trpc-go/codec"
 	"github.com/allegro/bigcache/v3"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/smartystreets/goconvey/convey"
+
+	"trpc.group/trpc-go/trpc-go/codec"
 )
 
 type TestParam struct {
@@ -25,7 +26,7 @@ type TestParam struct {
 func TestGetOrLoad(t *testing.T) {
 	convey.Convey("TestGetOrLoad", t, func() {
 		convey.Convey("TestGetOrLoad run succ", func() {
-			anyData, _ := ptypes.MarshalAny(&timestamp.Timestamp{Nanos: 1000, Seconds: 1000})
+			anyData, _ := anypb.New(&timestamp.Timestamp{Nanos: 1000, Seconds: 1000})
 			setData := &TestParam{Name: "林延秋", Age: 24,
 				ExInfo: map[string]interface{}{"Gender": true, "City": "shenzhen"},
 				Any:    anyData}
@@ -58,7 +59,7 @@ func TestGetOrLoad(t *testing.T) {
 		})
 
 		convey.Convey("TestGetOrLoad run error", func() {
-			anyData, _ := ptypes.MarshalAny(&timestamp.Timestamp{Nanos: 1000, Seconds: 1000})
+			anyData, _ := anypb.New(&timestamp.Timestamp{Nanos: 1000, Seconds: 1000})
 			setData := &TestParam{Name: "林延秋", Age: 24,
 				ExInfo: map[string]interface{}{"Gender": true, "City": "shenzhen"},
 				Any:    anyData}

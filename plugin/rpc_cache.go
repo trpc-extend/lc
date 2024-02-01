@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"time"
 
-	pcgmonitor "git.code.oa.com/pcgmonitor/trpc_report_api_go"
-	"git.code.oa.com/pcgmonitor/trpc_report_api_go/pb/nmnt"
-	"git.code.oa.com/trpc-go/trpc-go"
-	"git.code.oa.com/trpc-go/trpc-go/codec"
-	"git.code.oa.com/trpc-go/trpc-go/errs"
-	"git.code.oa.com/trpc-go/trpc-go/filter"
-	"git.code.oa.com/trpc-go/trpc-go/log"
-	"git.code.oa.com/trpc-go/trpc-go/plugin"
-	"git.woa.com/trpc-extend/trpc-go/lc"
+	"github.com/trpc-extend/trpc-go/lc"
+
+	"trpc.group/trpc-go/trpc-go"
+	"trpc.group/trpc-go/trpc-go/codec"
+	"trpc.group/trpc-go/trpc-go/errs"
+	"trpc.group/trpc-go/trpc-go/filter"
+	"trpc.group/trpc-go/trpc-go/log"
+	"trpc.group/trpc-go/trpc-go/metrics"
+	"trpc.group/trpc-go/trpc-go/plugin"
 )
 
 const (
@@ -167,7 +167,6 @@ func ClientFilter(t *RpcCachePlugin) filter.ClientFilter {
 
 // reportCacheMonitor 上报缓存监控数据
 func reportCacheMonitor(cacheName, rpcName, hitCacheFlag string, err error) {
-	key := []string{cacheName, rpcName, hitCacheFlag, strconv.Itoa(errs.Code(err)), ""}
 	hit := int64(0)
 	miss := int64(0)
 	other := int64(0)
@@ -184,19 +183,24 @@ func reportCacheMonitor(cacheName, rpcName, hitCacheFlag string, err error) {
 		}
 	}
 
-	values := []int64{
-		1,     // 上报总数
-		hit,   // 命中缓存
-		miss,  // 丢失缓存
-		other, // 禁止缓存
-		fail,  // 异常失败
-		0,     // 保留1
+	dimension := []*metrics.Dimension{
+		{Name: "CacheName", Value: cacheName},
+		{Name: "RpcName", Value: rpcName},
+		{Name: "HitCacheFlag", Value: hitCacheFlag},
+		{Name: "ErrCode", Value: strconv.Itoa(int(errs.Code(err)))},
+		{Name: "Reserve1", Value: ""},
+		{Name: "Reserve2", Value: ""},
 	}
-	stat := make([]*nmnt.StatValue, len(values))
-	for i, v := range values {
-		stat[i] = &nmnt.StatValue{Value: float64(v), Count: 1, Policy: nmnt.Policy_SUM}
+
+	metric := []*metrics.Metrics{
+		metrics.NewMetrics("request-count", 1, metrics.PolicySUM),
+		metrics.NewMetrics("cache-hit", float64(hit), metrics.PolicySUM),
+		metrics.NewMetrics("cache-miss", float64(miss), metrics.PolicySUM),
+		metrics.NewMetrics("cache-ban", float64(other), metrics.PolicySUM),
+		metrics.NewMetrics("cache-fail", float64(fail), metrics.PolicySUM),
+		metrics.NewMetrics("reserve-1", 0, metrics.PolicySUM),
 	}
-	if err = pcgmonitor.ReportCustom(pluginName, key, stat); err != nil {
-		log.Errorf("pcgmonitor ReportCustom failed! err: %v", err)
+	if err = metrics.ReportMultiDimensionMetricsX(pluginName, dimension, metric); err != nil {
+		log.Errorf("metrics report failed! err: %v", err)
 	}
 }

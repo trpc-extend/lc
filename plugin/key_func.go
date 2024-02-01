@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"git.code.oa.com/trpc-go/trpc-go"
+	"trpc.group/trpc-go/trpc-go"
 )
 
 // KeyFunc 获取缓存key的方法 key: 指定数据缓存的key newRsp: 需要回包的实例对象
