@@ -19,6 +19,8 @@ var (
 	ErrTypeNotEqual = errs.New(2001, "lc: type not equal")
 	// ErrNotCanSet interface不允许set
 	ErrNotCanSet = errs.New(2002, "lc: value cannot set")
+	// ErrRecordNotFound 没有发现对应记录数据
+	ErrRecordNotFound = errs.New(2003, "lc: record not found")
 )
 
 // Cache 缓存对象
@@ -129,6 +131,9 @@ func (c *Cache) GetBytes(key string) ([]byte, error) {
 func (c *Cache) Get(key string, val interface{}, serializationType int) error {
 	entry, err := c.bc.Get(key)
 	if entry == nil || err != nil {
+		if err == bigcache.ErrEntryNotFound {
+			err = ErrRecordNotFound
+		}
 		return err
 	}
 	err = codec.Unmarshal(serializationType, entry, val)
